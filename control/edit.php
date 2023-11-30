@@ -30,9 +30,19 @@ $PAGE->set_url(new moodle_url('/local/control/edit.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title("Parents Signup");
 
+require_login();
+
 $mform = new parents_signup();
 
 echo $OUTPUT->header();
+
+// Check if the user_count is set in the session
+if (isset($_SESSION['user_count'])) {
+    // Check if user_count is 1, then redirect to manage.php
+    if ($_SESSION['user_count'] == 1) {
+        redirect(new moodle_url('/local/control/manage.php'));
+    }
+}
 
 if ($mform->is_cancelled()) {
     redirect($CFG->wwwroot . '/local/control/manage.php', 'You redirected to another page');

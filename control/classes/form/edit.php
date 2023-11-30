@@ -22,7 +22,7 @@ class parents_signup extends moodleform
 
         $mform->addElement('text', 'student_id', 'Student ID', 'maxlength="100" size="30"');
         $mform->setType('student_id', PARAM_NOTAGS);
-        $mform->setDefault('student_id', 'Enter Student ID');
+        $mform->setDefault('student_id', isset($USER->id) ? $USER->id : '');
 
         $this->add_action_buttons(true, 'Signup');
 
@@ -31,6 +31,21 @@ class parents_signup extends moodleform
 
     function validation($data, $files)
     {
-        return [];
+        $errors = [];
+
+        // Check if the student ID already exists
+        global $DB;
+        $existingStudent = $DB->get_record('parents_login', ['student_id' => $data['student_id']]);
+        if ($existingStudent) {
+            $errors['student_id'] = 'Student ID already used. So, go to login page to logged in.';
+        }
+        if (empty($data['password'])) {
+            $errors['password'] = 'Password is not entered';
+        }
+        if (empty($data['student_id'])) {
+            $errors['student_id'] = 'Student ID is not entered';
+        }
+
+        return $errors;
     }
 }

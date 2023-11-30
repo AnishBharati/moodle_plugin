@@ -18,7 +18,7 @@ class parents_login extends moodleform
 
         $this->add_action_buttons(true, 'Login');
 
-        $mform->addElement('html', '<a href="' . new moodle_url('/local/control/edit.php') . '">If you already signed up, then click here to Login</a>');
+        $mform->addElement('html', '<a href="' . new moodle_url('/local/control/edit.php') . '">If you havenot Signup, then click here to Signup</a>');
     }
 
     function validation($data, $files)
