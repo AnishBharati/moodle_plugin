@@ -4,7 +4,7 @@ require_once("$CFG->libdir/formslib.php");
 class parents_signup extends moodleform
 {
     public function definition()
-    {
+    {   global $USER;
         $mform = $this->_form;
         $mform->addElement('header', 'general', 'Parent Signup');
 
@@ -22,7 +22,7 @@ class parents_signup extends moodleform
 
         $mform->addElement('text', 'student_id', 'Student ID', 'maxlength="100" size="30"');
         $mform->setType('student_id', PARAM_NOTAGS);
-        $mform->setDefault('student_id', isset($USER->id) ? $USER->id : '');
+        $mform->setDefault('student_id', "ID");
 
         $this->add_action_buttons(true, 'Signup');
 

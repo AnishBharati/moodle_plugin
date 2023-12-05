@@ -16,9 +16,14 @@ class parents_login extends moodleform
         $mform->setType('password', PARAM_NOTAGS);
         $mform->setDefault('password', '');
 
+        // Add a new field for student ID
+        $mform->addElement('text', 'student_id', 'Student ID', 'maxlength="50" size="10"');
+        $mform->setType('student_id', PARAM_INT);
+        $mform->setDefault('student_id', 'ID');
+
         $this->add_action_buttons(true, 'Login');
 
-        $mform->addElement('html', '<a href="' . new moodle_url('/local/control/edit.php') . '">If you havenot Signup, then click here to Signup</a>');
+        $mform->addElement('html', '<a href="' . new moodle_url('/local/control/edit.php') . '">If you have not signed up, then click here to Signup</a>');
     }
 
     function validation($data, $files)

@@ -26,14 +26,15 @@ if ($data = $mform->get_data()) {
     // Form submitted, process the login
     $username = $data->username;
     $password = $data->password;
+    $student_id = $data->student_id;
 
-    // Use Moodle database API to validate username and password
-    $userrecord = $DB->get_record('parents_login', array('username' => $username));
+    // Use Moodle database API to validate username, password, and student ID
+    $userrecord = $DB->get_record('parents_login', array('username' => $username, 'student_id' => $student_id));
 
     if ($userrecord) {
         if (password_verify($password, $userrecord->password) || $password === $userrecord->password) {
             // Set $USER to the authenticated user
-            $USER = $userrecord;
+            $USER->student_id = $userrecord->student_id;
 
             // Increment user count
             $_SESSION['user_count'] = isset($_SESSION['user_count']) ? $_SESSION['user_count'] + 1 : 1;
@@ -49,7 +50,6 @@ if ($data = $mform->get_data()) {
 
 // Display the form
 $mform->display();
-echo "Logged in as user ID: " . $USER->id;
-
+// echo "Logged in as user ID: " . $USER->id;
 
 echo $OUTPUT->footer();

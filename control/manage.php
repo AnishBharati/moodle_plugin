@@ -36,46 +36,94 @@ echo '<input type="submit" value="Logout">';
 echo '</form>';
 echo '</div>';
 
-// Sample data for grades with subjects
-$sampleDataGrades = array(
-    array('userid' => 1, 'grade' => 85, 'subject' => 'Math'),
-    array('userid' => 2, 'grade' => 92, 'subject' => 'English'),
-    // Add more sample data as needed
-);
+// Function to generate table HTML for Grades
+function generateGradesTable($student_id) {
+    global $DB;
 
-// Fetch data from the mdl_course and mdl_user tables
-$courseData = $DB->get_records_sql('
-    SELECT c.id AS courseid, c.fullname AS coursename, c.shortname, u.firstname
-    FROM {course} c
-    JOIN {enrol} e ON e.courseid = c.id
-    JOIN {user_enrolments} ue ON ue.enrolid = e.id
-    JOIN {user} u ON u.id = ue.userid
-');
+    // Fetch data from Moodle database tables for Grades
+    $sql = "SELECT c.courseid, c.coursename, t.grade
+            FROM {courses_data} c
+            JOIN {takes} t ON c.courseid = t.courseid
+            WHERE t.id = :student_id";
 
-// Function to generate table HTML
-function generateTable($data, $tableName) {
+    $params = ['student_id' => $student_id];
+    $data = $DB->get_records_sql($sql, $params);
+    try {
+        $data = $DB->get_records_sql($sql, $params);
+    } catch (dml_exception $e) {
+        // Print the error message for debugging
+        echo 'Database error: ' . $e->getMessage();
+        return ''; // Return an empty string to avoid displaying incomplete data
+    }
+
+    // Display the Grades table
     $table = '<div style="width: 48%; margin: 1%; float: left;">';
     $table .= '<div style="padding: 20px; border: 1px solid #ccc; border-radius: 5px;">';
-    $table .= '<h2 style="text-align: left;">' . $tableName . ' Information</h2>';
+    $table .= '<h2 style="text-align: left;">Grades Information</h2>';
     $table .= '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">';
     $table .= '<thead style="background-color: #f2f2f2; border-bottom: 1px solid #ccc;">';
 
-    // Header row based on the table type
-    if ($tableName === 'Grades') {
-        $table .= '<tr><th style="padding: 10px; text-align: left;">User ID</th><th style="padding: 10px; text-align: left;">Grade</th><th style="padding: 10px; text-align: left;">Subject</th></tr>';
-    } elseif ($tableName === 'Courses') {
-        $table .= '<tr><th style="padding: 10px; text-align: left;">Course ID</th><th style="padding: 10px; text-align: left;">Course Name</th><th style="padding: 10px; text-align: left;">Short Name</th><th style="padding: 10px; text-align: left;">Student Name</th></tr>';
-    }
+    // Header row for Grades
+    $table .= '<tr><th style="padding: 10px; text-align: left;">Course ID</th><th style="padding: 10px; text-align: left;">Course Name</th><th style="padding: 10px; text-align: left;">Grade</th></tr>';
 
     $table .= '</thead>';
     $table .= '<tbody>';
 
-    // Data rows
+    // Data rows for Grades
     foreach ($data as $entry) {
         $table .= '<tr style="border-bottom: 1px solid #ccc;">';
-        foreach ($entry as $value) {
-            $table .= '<td style="padding: 10px;">' . $value . '</td>';
-        }
+        $table .= '<td style="padding: 10px;">' . $entry->courseid . '</td>';
+        $table .= '<td style="padding: 10px;">' . $entry->coursename . '</td>';
+        $table .= '<td style="padding: 10px;">' . $entry->grade . '</td>';
+        $table .= '</tr>';
+    }
+
+    $table .= '</tbody>';
+    $table .= '</table>';
+    $table .= '</div>';
+    $table .= '</div>';
+
+    return $table;
+}
+
+// Function to generate table HTML for Courses
+function generateCoursesTable($student_id) {
+    global $DB;
+
+    // Fetch data from Moodle database tables for Courses
+    $sql = "SELECT c.courseid, c.coursename
+            FROM {courses_data} c
+            JOIN {takes} t ON c.courseid = t.courseid
+            WHERE t.id = :student_id";
+
+    $params = ['student_id' => $student_id];
+    $data = $DB->get_records_sql($sql, $params);
+    try {
+        $data = $DB->get_records_sql($sql, $params);
+    } catch (dml_exception $e) {
+        // Print the error message for debugging
+        echo 'Database error: ' . $e->getMessage();
+        return ''; // Return an empty string to avoid displaying incomplete data
+    }
+
+    // Display the Courses table
+    $table = '<div style="width: 48%; margin: 1%; float: left;">';
+    $table .= '<div style="padding: 20px; border: 1px solid #ccc; border-radius: 5px;">';
+    $table .= '<h2 style="text-align: left;">Courses Information</h2>';
+    $table .= '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">';
+    $table .= '<thead style="background-color: #f2f2f2; border-bottom: 1px solid #ccc;">';
+
+    // Header row for Courses
+    $table .= '<tr><th style="padding: 10px; text-align: left;">Course ID</th><th style="padding: 10px; text-align: left;">Course Name</th></tr>';
+
+    $table .= '</thead>';
+    $table .= '<tbody>';
+
+    // Data rows for Courses
+    foreach ($data as $entry) {
+        $table .= '<tr style="border-bottom: 1px solid #ccc;">';
+        $table .= '<td style="padding: 10px;">' . $entry->courseid . '</td>';
+        $table .= '<td style="padding: 10px;">' . $entry->coursename . '</td>';
         $table .= '</tr>';
     }
 
@@ -90,16 +138,24 @@ function generateTable($data, $tableName) {
 // Display the "Welcome" message in the center
 echo '<div style="text-align: center; margin: 20px;">';
 echo '<h1>Welcome</h1>';
-echo '<p style="text-align: center;">Logged in as user ID: ' . $USER->id . '</p>';
+echo '<p style="text-align: center;">Logged in as user ID: ' . $USER->student_id . '</p>';
 echo '</div>';
 
-// Display the course table using data fetched from the database
+// Retrieve user information from the database
+$userInfo = $DB->get_record('user', array('id' => $USER->student_id), 'id, firstname, lastname, email');
+
+if ($userInfo) {
+    echo '<p style="text-align: center;">Logged in as: ' . fullname($userInfo) . '<br>';
+    echo 'Email: ' . $userInfo->email . '</p>';
+} else {
+    echo '<p style="text-align: center;">Unable to retrieve user information.</p>';
+}
+
+// Display the tables using data from Moodle databases
 echo '<div style="overflow: auto;">'; // Parent container
-echo generateTable($sampleDataGrades, 'Grades');
-echo generateTable($courseData, 'Courses');
+echo generateGradesTable($USER->student_id);
+echo generateCoursesTable($USER->student_id);
 echo '</div>';
-
-// Print the "Logged in as user ID" message below the tables
 
 echo $OUTPUT->footer();
 

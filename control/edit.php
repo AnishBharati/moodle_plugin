@@ -53,8 +53,8 @@ if ($mform->is_cancelled()) {
     $recordtoinsert->password = $hashed_password;
     $recordtoinsert->full_name = $fromform->full_name;
     $recordtoinsert->student_id = $fromform->student_id;
-
-    $DB->insert_record('parents_login', $recordtoinsert);
+    
+ $DB->insert_record('parents_login', $recordtoinsert);
 
     redirect(new moodle_url('/local/control/login.php'));
 } else {
