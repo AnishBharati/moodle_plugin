@@ -24,5 +24,4 @@
 
 function local_control_before_footer()
 {
-    // Use a valid notification level, e.g., NOTIFY_WARNING or NOTIFY_SUCCESS
 }

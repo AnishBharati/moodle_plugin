@@ -10,8 +10,8 @@
       "port": 3306,
       "driver": "MariaDB",
       "name": "localhost",
-      "username": "root",
       "database": "moodle",
+      "username": "root",
       "password": ""
     }
   ]
