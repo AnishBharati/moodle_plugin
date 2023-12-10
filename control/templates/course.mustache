@@ -15,56 +15,38 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_control/manage
+    @template local_control/course
 
     Example context (json):
     {
     }
 }}
-
-<h1><u>Welcome<u></h1>
-<br><br>
-<h3><u>{{texttodisplay}}</u></h3>
-
-<style>
-    table {
-        border-collapse: collapse;
-        width: 50%;
-        margin: auto;
-        margin-top: 20px;
-        background-color: #f2f2f2;
-    }
-
-    th, td {
-        border: 1px solid #dddddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    h3 {
-        text-align: center;
-        text-decoration: underline;
-        margin-bottom: 10px;
-    }
-
-    strong {
-        font-weight: bold;
-    }
-</style>
-
+<div>
+<br>
+<br>
+<br>
 <table>
-    <h3>Student Information</h3>
+    <h3>Assignment Details</h3>
     <tr>
-        <td><strong>Name</strong></td>
-        <td>{{name}}</td>
+        <th><strong>S.N.</strong></th>
+        <th><strong>Course Name</strong></th>
+        <th><strong>Assignment</strong></th>
+        <th><strong>Due Date</strong></th>
+        <th><strong>Status</strong></th>
+        <th><strong>Grade</strong></th>
     </tr>
     <tr>
-        <td><strong>Email</strong></td>
-        <td>{{email}}</td>
+        <td>{{i}}</td>
+        <td>{{course_name}}</td>
+        <td>{{assign_name}}</td>
+        <td>{{due_date}}</td>
+        <td>{{submit_status}}</td>
+        <td>{{grade}}</td>
+
     </tr>
-    <tr>
-        <td><strong>Student ID</strong></td>
-        <td>{{id}}</td>
 </table>
+
+</div>
+<br>
 <br>
 <br>

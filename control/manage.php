@@ -49,17 +49,51 @@ $templatecontext['id'] = $id;
 
 echo $OUTPUT->render_from_template('local_control/manage', $templatecontext);
 
+$user_courses = $DB->get_records('user_enrolments', array('userid' => $USER->id));
+
+echo '<style>';
+echo '.course-cards { display: flex; flex-wrap: wrap; justify-content: space-around; }';
+echo '.course-card { width: 300px; padding: 20px; margin: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }';
+echo '.course-card h3 { font-size: 1.5em; margin-bottom: 10px; }';
+echo '.course-card p { color: #555; }';
+echo '.course-card a { display: block; margin-top: 15px; color: #007bff; text-decoration: none; }';
+echo '</style>';
+
+echo '<br>';
+echo '<h3 style="text-align: center;">List of Enrolled Courses</h3>';
+
 if (!empty($user_courses)) {
-    echo '<ul>';
+    echo '<div class="course-cards">';
     foreach ($user_courses as $enrolment) {
         // Fetch course information using enrol ID
-        $course = $DB->get_record('course', array('id' => $enrolment->enrolid));
-        echo '<li><a href="' . new moodle_url('/course/view.php', array('id' => $course->id)) . '">' . $course->fullname . '</a></li>';
+        $enrol_course = $DB->get_record('enrol', array('id' => $enrolment->enrolid));
+
+        if ($enrol_course) {
+            // Fetch course information using course ID
+            $course = $DB->get_record('course', array('id' => $enrol_course->courseid));
+
+            if ($course) {
+                // Display course card
+                echo '<div class="course-card">';
+                echo '<h3>' . $course->fullname . '</h3>';
+                echo '<p>' . $course->shortname . '</p>';
+                echo '<a href="' . new moodle_url('/course/view.php', array('id' => $course->id)) . '">Go to Course</a>';
+                echo '</div>';
+            } else {
+                echo '<p>Course information not found.</p>';
+            }
+        } else {
+            echo '<p>Enrolment information not found.</p>';
+        }
     }
-    echo '</ul>';
+    echo '</div>';
 } else {
     echo '<p>You are not enrolled in any courses.</p>';
 }
+
+$user_grade = $DB->get_record('assign_grades', array('userid' => $USER->id));
+
+echo $user_grade;
 
 echo $OUTPUT->footer();
 
