@@ -19,33 +19,39 @@
 
     Example context (json):
     {
+        "assignments": [
+            {"course_name": "Course 1", "assign_name": "Assignment 1", "submit_status": "Submitted", "grade": "A"},
+            {"course_name": "Course 2", "assign_name": "Assignment 2", "submit_status": "Not Submitted", "grade": ""},
+            {"course_name": "Course 3", "assign_name": "Assignment 3", "submit_status": "Submitted", "grade": "B"}
+        ]
     }
 }}
+
 <div>
-<br>
-<br>
-<br>
-<table>
-    <h3>Assignment Details</h3>
-    <tr>
-        <th><strong>S.N.</strong></th>
-        <th><strong>Course Name</strong></th>
-        <th><strong>Assignment</strong></th>
-        <th><strong>Due Date</strong></th>
-        <th><strong>Status</strong></th>
-        <th><strong>Grade</strong></th>
-    </tr>
-    <tr>
-        <td>{{i}}</td>
-        <td>{{course_name}}</td>
-        <td>{{assign_name}}</td>
-        <td>{{due_date}}</td>
-        <td>{{submit_status}}</td>
-        <td>{{grade}}</td>
-
-    </tr>
-</table>
-
+    <br>
+    <br>
+    <br>
+    <table style="width:75%">
+        <h3>Assignment Details</h3>
+        <tr>
+            <th><strong>Course Name</strong></th>
+            <th><strong>Assignment</strong></th>
+            <th><strong>Status</strong></th>
+            <th><strong>Due Date</strong></th>
+            <th><strong>Grade</strong></th>
+            <th><strong>Checked By</strong></th>
+        </tr>
+        {{#assignments}}
+            <tr>
+                <td>{{course_name}}</td>
+                <td>{{assignment_name}}</td>
+                <td>{{submission_status}}</td>
+                <td>{{due_date}}</td>
+                <td>{{grade}}</td>
+                <td>{{teacher_name}}</td>
+            </tr>
+        {{/assignments}}
+    </table>
 </div>
 <br>
 <br>

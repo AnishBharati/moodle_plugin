@@ -30,35 +30,50 @@ $PAGE->set_url(new moodle_url('/local/control/edit.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title("Parents Signup");
 
-require_login();
+$user_role = $DB->get_record('role_assignments', array('userid' => $USER->id));
 
-$mform = new parents_signup();
+if ($user_role && property_exists($user_role, 'roleid')) {
+    $role_id = $user_role->roleid;
 
-echo $OUTPUT->header();
+    if ($role_id == 5) {
+        require_login();
 
-// Check if the user_count is set in the session
-if (isset($_SESSION['user_count'])) {
-    // Check if user_count is 1, then redirect to manage.php
-    if ($_SESSION['user_count'] == 1) {
-        redirect(new moodle_url('/local/control/manage.php'));
+        $mform = new parents_signup();
+
+        echo $OUTPUT->header();
+
+        // Check if the user_count is set in the session
+        if (isset($_SESSION['user_count'])) {
+            // Check if user_count is 1, then redirect to manage.php
+            if ($_SESSION['user_count'] == 1) {
+                redirect(new moodle_url('/local/control/manage.php'));
+            }
+        }
+
+        if ($mform->is_cancelled()) {
+            redirect($CFG->wwwroot . '/local/control/manage.php', 'You redirected to another page');
+        } else if ($fromform = $mform->get_data()) {
+            $recordtoinsert = new stdClass();
+            $hashed_password = password_hash($fromform->password, PASSWORD_DEFAULT);
+            $recordtoinsert->username = $fromform->username;
+            $recordtoinsert->password = $hashed_password;
+            $recordtoinsert->full_name = $fromform->full_name;
+            $recordtoinsert->student_id = $fromform->student_id;
+
+            $DB->insert_record('parents_login', $recordtoinsert);
+
+            redirect(new moodle_url('/local/control/login.php'));
+        } else {
+            $mform->display();
+        }
+
+        echo $OUTPUT->footer();
+    } else {
+        $message = "You are not a student to be logged into the Parent Control Plugin";
+        \core\notification::error($message);
+        redirect(new moodle_url('/'));
     }
-}
-
-if ($mform->is_cancelled()) {
-    redirect($CFG->wwwroot . '/local/control/manage.php', 'You redirected to another page');
-} else if ($fromform = $mform->get_data()) {
-    $recordtoinsert = new stdClass();
-    $hashed_password = password_hash($fromform->password, PASSWORD_DEFAULT);
-    $recordtoinsert->username = $fromform->username;
-    $recordtoinsert->password = $hashed_password;
-    $recordtoinsert->full_name = $fromform->full_name;
-    $recordtoinsert->student_id = $fromform->student_id;
-
-    $DB->insert_record('parents_login', $recordtoinsert);
-
-    redirect(new moodle_url('/local/control/login.php'));
 } else {
-    $mform->display();
+    $message = "Error retrieving user role information";
+    \core\notification::error($message);
 }
-
-echo $OUTPUT->footer();
