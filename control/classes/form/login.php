@@ -16,6 +16,10 @@ class parents_login extends moodleform
         $mform->setType('password', PARAM_NOTAGS);
         $mform->setDefault('password', '');
 
+        $mform->addElement('text', 'student_id', 'Student ID', 'maxlength="100" size="30"');
+        $mform->setType('student_id', PARAM_NOTAGS);
+        $mform->setDefault('student_id', 'Enter Student ID');
+
         $this->add_action_buttons(true, 'Login');
 
         $mform->addElement('html', '<a href="' . new moodle_url('/local/control/edit.php') . '">If you havenot Signup, then click here to Signup</a>');
@@ -23,6 +27,28 @@ class parents_login extends moodleform
 
     function validation($data, $files)
     {
-        return [];
+         $errors=[];
+        global $DB,$USER;
+        //  $studentID=$DB
+        if ($USER->id!=$data['student_id']){
+            $errors['student_id'] = "Student ID doesn't matched.";
+                // $studentID=$DB->get_record('parents_login',['student_id'=>$data['student_id']]);
+                // if($studentID){
+                //     $username = $studentID->username;
+                //     if()
+                }else if( ($USER->id==$data['student_id'])) {
+                $studentID=$DB->get_record('parents_login',['student_id'=>$data['student_id']]);
+                if($studentID){
+                    $username = $studentID->username;
+                    if($username!=$data['username']){
+                        $errors['username']="Username doesn't match. ";
+                    }
+
+                }
+                // $existingStudent = $DB->get_record('user', ['id' => $data['student_id']]);
+
+        }
+        return $errors;
+
     }
 }
