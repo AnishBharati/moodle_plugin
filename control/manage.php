@@ -216,12 +216,13 @@ if ($role_id == 5) {
     echo $OUTPUT->render_from_template('local_control/attendance', $templatecontext);
 
 
-    echo $OUTPUT->footer();
 } else {
     $message = "You are not a student to be logged into the Parent Control Plugin";
     \core\notification::error($message);
     redirect(new moodle_url('/'));
 }
+include(__DIR__ . '/calen.php');
+echo $OUTPUT->footer();
 
 function is_user_authenticated()
 {
