@@ -1,121 +1,153 @@
-<style>
-  .table-container {
-    overflow-y: auto;
-  }
+<!DOCTYPE html>
+<html lang="en">
 
-  .table-container thead {
-    position: sticky;
-    top: 0;
-    background-color: #f8f8f8;
-    z-index: 1;
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-    height: 50px;
-  }
-
-  .table-container tbody tr:nth-child(-n+5) {
-    background-color: #f8f8f8;
-  }
-
-  .table-container tbody {
-    display: block;
-    max-height: calc(300px - 50px);
-    overflow-y: auto;
-  }
-
-  .table-container tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-  }
-
-  .filter-input {
-    margin-bottom: 10px;
-  }
-
-  .dropdown-container {
-    margin-bottom: 10px;
-  }
-  .dropdown-container {
-  text-align: center;
-  margin: auto;
-}
-
-#tableDropdown {
-  display: block;
-  margin: auto;
-}
-
-</style>
-
-<h3 style="text-align: center;">Attendance Table</h3>
-
-<div class="dropdown-container" >
-  <label for="tableDropdown">Table Visibility:</label>
-  <select id="tableDropdown" onchange="toggleTable()">
-    <option value="show">Show Table</option>
-    <option value="hide">Hide Table</option>
-  </select>
-</div>
-
-<div class="filter-input" id="filterContainer">
-  <label for="filterInput">Filter by Course:</label>
-  <input type="text" id="filterInput" oninput="filterTable()" placeholder="Type to filter courses">
-</div>
-
-<div class="table-container" id="attendanceTableContainer">
-  <table border="1" style="width:100%;">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Attendance</th>
-        <th>Remarks</th>
-        <th>Courses</th>
-      </tr>
-    </thead>
-    <tbody id="attendanceTableBody">
-      {{#attendanceData}}
-        <tr data-course="{{courses}}">
-          <td>{{date}}</td>
-          <td>{{attendance}}</td>
-          <td>{{remarks}}</td>
-          <td>{{courses}}</td>
-        </tr>
-      {{/attendanceData}}
-    </tbody>
-  </table>
-</div>
-
-<script>
-  function toggleTable() {
-    var dropdownValue = document.getElementById("tableDropdown").value;
-    var tableContainer = document.getElementById("attendanceTableContainer");
-    var filterContainer = document.getElementById("filterContainer");
-
-    if (dropdownValue === "show") {
-      tableContainer.style.display = "block";
-      filterContainer.style.display = "block";
-    } else {
-      tableContainer.style.display = "none";
-      filterContainer.style.display = "none";
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+      margin: 20px;
     }
-  }
 
-  function filterTable() {
-    var filterValue = document.getElementById("filterInput").value.toUpperCase();
-    var table = document.getElementById("attendanceTableBody");
-    var rows = table.getElementsByTagName("tr");
+    h3 {
+      text-align: center;
+      color: #333;
+    }
 
-    for (var i = 0; i < rows.length; i++) {
-      var courseValue = rows[i].getAttribute("data-course").toUpperCase();
-      var textContent = rows[i].textContent || rows[i].innerText;
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-      if (filterValue === "" || courseValue.includes(filterValue)) {
-        rows[i].style.display = "";
+    .dropdown-container,
+    .filter-input {
+      margin-bottom: 20px;
+    }
+
+    .table-container {
+      overflow-y: auto;
+      max-height: 300px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f8f8f8;
+    }
+
+    .table-container tbody tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .filter-input input {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .dropdown-container select {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h3>Attendance Table</h3>
+
+    <div class="dropdown-container">
+      <label for="tableDropdown">Table Visibility:</label>
+      <select id="tableDropdown" onchange="toggleTable()">
+        <option value="show">Show Table</option>
+        <option value="hide">Hide Table</option>
+      </select>
+    </div>
+
+    <div class="filter-input" id="filterContainer">
+      <label for="filterInput">Filter by Course:</label>
+      <input type="text" id="filterInput" oninput="filterTable()" placeholder="Type to filter courses">
+    </div>
+
+    <div class="table-container" id="attendanceTableContainer">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Attendance</th>
+            <th>Remarks</th>
+            <th>Courses</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceTableBody">
+          {{#attendanceData}}
+          <tr data-course="{{courses}}">
+            <td>{{date}}</td>
+            <td>{{attendance}}</td>
+            <td>{{remarks}}</td>
+            <td>{{courses}}</td>
+          </tr>
+          {{/attendanceData}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function toggleTable() {
+      var dropdownValue = document.getElementById("tableDropdown").value;
+      var tableContainer = document.getElementById("attendanceTableContainer");
+      var filterContainer = document.getElementById("filterContainer");
+
+      if (dropdownValue === "show") {
+        tableContainer.style.display = "block";
+        filterContainer.style.display = "block";
       } else {
-        rows[i].style.display = "none";
+        tableContainer.style.display = "none";
+        filterContainer.style.display = "none";
       }
     }
-  }
-</script>
+
+    function filterTable() {
+      var filterValue = document.getElementById("filterInput").value.toUpperCase();
+      var table = document.getElementById("attendanceTableBody");
+      var rows = table.getElementsByTagName("tr");
+
+      for (var i = 0; i < rows.length; i++) {
+        var courseValue = rows[i].getAttribute("data-course").toUpperCase();
+        var textContent = rows[i].textContent || rows[i].innerText;
+
+        if (filterValue === "" || courseValue.includes(filterValue)) {
+          rows[i].style.display = "";
+        } else {
+          rows[i].style.display = "none";
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>
