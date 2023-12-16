@@ -82,6 +82,7 @@ if ($role_id == 5) {
                     echo '<div class="course-card">';
                     echo '<h3>' . $course->fullname . '</h3>';
                     echo '<p>' . $course->shortname . '</p>';
+                    echo '<a href="' . new moodle_url('/course/view.php', array('id' => $course->id)) . '">Go to Course</a>';
                     echo '</div>';
                 } else {
                     echo '<p>Course information not found.</p>';
@@ -153,8 +154,7 @@ if ($role_id == 5) {
 
     echo $OUTPUT->render_from_template('local_control/course', $templatecontext);
 
-    echo "<br>";
-    echo "<br>";
+
     // Fetch attendance data from the database based on the user ID
     $attendanceDataFromDB = $DB->get_records('attendance_log', array('studentid' => $USER->id));
 
@@ -188,18 +188,24 @@ if ($role_id == 5) {
                 if ($status) {
                     $statusDescription = $status->description;
                 } else {
+                    // Handle the case where status information is not found
+                    // (You may log an error or provide a default value)
                 }
 
                 // Add the data to the array
                 $attendanceData[] = array(
                     'date' => $date,
-                    'attendance' => $statusDescription,
-                    'remarks' => $log->remarks,
-                    'courses' => $course_id->shortname,
+                    'attendance' => $statusDescription, // Use the status description instead of statusid
+                    'remarks' => $log->remarks, // Replace with the actual remarks data
+                    'courses' => $course_id->shortname, // Replace with the actual field name for course name
                 );
             } else {
+                // Handle the case where attendance information is not found
+                // (You may log an error or provide a default value)
             }
         } else {
+            // Handle the case where session information is not found
+            // (You may log an error or provide a default value)
         }
     }
 
@@ -208,13 +214,13 @@ if ($role_id == 5) {
 
     // Render the attendance table using Mustache
     echo $OUTPUT->render_from_template('local_control/attendance', $templatecontext);
+
+
 } else {
     $message = "You are not a student to be logged into the Parent Control Plugin";
     \core\notification::error($message);
     redirect(new moodle_url('/'));
 }
-echo "<br";
-echo "<br";
 include(__DIR__ . '/calen.php');
 echo $OUTPUT->footer();
 
