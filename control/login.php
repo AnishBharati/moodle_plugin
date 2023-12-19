@@ -45,7 +45,8 @@ if ($role_id == 5) {
                 redirect(new moodle_url('/local/control/manage.php'));
             } else {
                 // Authentication failed
-                echo 'Authentication failed. Please try again.';
+                $message = "Authentication Failed. Username or Password Incorrect";
+                \core\notification::error($message);
             }
         }
     }

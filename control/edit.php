@@ -23,15 +23,17 @@
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/control/classes/form/edit.php');
+// require 'vendor/autoload.php'; // Load Composer's autoloader
 
-global $DB, $PAGE;
+// use GuzzleHttp\Client;
+
+global $DB, $PAGE, $USER;
 
 $PAGE->set_url(new moodle_url('/local/control/edit.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title("Parents Signup");
 
 $user_role = $DB->get_record('role_assignments', array('userid' => $USER->id));
-
 $role_id = $user_role->roleid;
 
 if ($role_id == 5) {
@@ -52,16 +54,30 @@ if ($role_id == 5) {
     if ($mform->is_cancelled()) {
         redirect($CFG->wwwroot . '/local/control/manage.php', 'You redirected to another page');
     } else if ($fromform = $mform->get_data()) {
+        $verify_token = md5(rand());
         $recordtoinsert = new stdClass();
         $hashed_password = password_hash($fromform->password, PASSWORD_DEFAULT);
         $recordtoinsert->username = $fromform->username;
         $recordtoinsert->password = $hashed_password;
         $recordtoinsert->full_name = $fromform->full_name;
         $recordtoinsert->student_id = $fromform->student_id;
+        $recordtoinsert->email = $fromform->email;
+        $recordtoinsert->verify_token = $verify_token;
 
+        // Insert record into the database and check for success
         $DB->insert_record('parents_login', $recordtoinsert);
 
         redirect(new moodle_url('/local/control/login.php'));
+        //     // sendemail_verify($recordtoinsert->username, $recordtoinsert->email, $verify_token);
+
+        //     // Log SMTP debug information
+        //     // error_log("SMTP Debug Information: " . print_r($mail->smtp->debug, true));
+        //     $message = "Please check your email for email verification";
+        //     \core\notification::info($message);
+        //   redirect(new moodle_url('/local/control/login.php'));
+        // } else {
+        //     redirect(new moodle_url('/local/control/edit.php'));
+        // }
     } else {
         $mform->display();
     }
@@ -72,3 +88,43 @@ if ($role_id == 5) {
     \core\notification::error($message);
     redirect(new moodle_url('/'));
 }
+
+
+// function sendemail_verify($username, $email, $verify_token)
+// {
+//     // EmailJS parameters
+//     $emailJsUserId = 'YOUR_EMAILJS_USER_ID';
+//     $emailJsServiceId = 'service_xud34s4';
+//     $emailJsTemplateId = 'template_pw9z0pg';
+
+//     // EmailJS API endpoint
+//     $emailJsEndpoint = "https://api.emailjs.com/api/v1.0/email/send";
+
+//     // EmailJS API request payload
+//     $payload = [
+//         'user_id' => $emailJsUserId,
+//         'service_id' => $emailJsServiceId,
+//         'template_id' => $emailJsTemplateId,
+//         'template_params' => [
+//             'username' => $username,
+//             'email' => $email,
+//             'verify_token' => $verify_token,
+//         ],
+//     ];
+
+//     // Use GuzzleHttp to make an HTTP POST request to EmailJS API
+//     $client = new Client();
+//     $response = $client->post($emailJsEndpoint, [
+//         'json' => $payload,
+//     ]);
+
+//     // Handle the response as needed
+//     $statusCode = $response->getStatusCode();
+//     if ($statusCode == 200) {
+//         // Email sent successfully
+//         echo "Email sent successfully!";
+//     } else {
+//         // Email sending failed
+//         echo "Failed to send email. Status Code: $statusCode";
+//     }
+// }

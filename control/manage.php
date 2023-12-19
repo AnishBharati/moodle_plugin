@@ -14,30 +14,13 @@ if (!is_user_authenticated()) {
     redirect(new moodle_url('/local/control/login.php'));
 }
 
-// Handle logout
-if (optional_param('logout', 0, PARAM_BOOL)) {
-
-    // Decrement user count
-    $_SESSION['user_count'] = isset($_SESSION['user_count']) ? max(0, $_SESSION['user_count'] - 1) : 0;
-
-    // Redirect to login page after logout
-    redirect(new moodle_url('/local/control/login.php'));
-}
-
 $user_role = $DB->get_record('role_assignments', array('userid' => $USER->id));
-
 $role_id = $user_role->roleid;
 
 if ($role_id == 5) {
     echo $OUTPUT->header();
 
-    // Display the logout button
-    echo '<div style="text-align: right;">';
-    echo '<form method="post" action="' . new moodle_url('/local/control/manage.php') . '">';
-    echo '<input type="hidden" name="logout" value="1">';
-    echo '<input type="submit" value="Logout">';
-    echo '</form>';
-    echo '</div>';
+    include(__DIR__ . '/navigation.php');
 
     // user is recognized by the user id 
     $user = $DB->get_record('user', array('id' => $USER->id));
@@ -47,15 +30,16 @@ if ($role_id == 5) {
 
     $user_courses = $DB->get_records('user_enrolments', array('userid' => $USER->id));
 
-    //value of name and email are sent to mustache file
+    // value of name and email are sent to the Mustache file
     $templatecontext['name'] = $name;
     $templatecontext['email'] = $email;
     $templatecontext['id'] = $id;
 
+    // Render the main content on the left
+    echo '<div style="float: left; width: 70%; border-right: 2px solid #ddd; padding-right: 10px;">';
     echo $OUTPUT->render_from_template('local_control/manage', $templatecontext);
 
-    $user_courses = $DB->get_records('user_enrolments', array('userid' => $USER->id));
-
+    // Display the list of enrolled courses
     echo '<style>';
     echo '.course-cards { display: flex; flex-wrap: wrap; justify-content: space-around; }';
     echo '.course-card { width: 300px; padding: 20px; margin: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }';
@@ -95,128 +79,15 @@ if ($role_id == 5) {
         echo '<p>You are not enrolled in any courses.</p>';
     }
 
-    $template_data = array(); // Array to store assignment data
+    echo '</div>';  // Close the main content div
 
-    if (!empty($user_courses)) {
-        foreach ($user_courses as $enrolments) {
-            $enrol_course = $DB->get_record('enrol', array('id' => $enrolments->enrolid));
+    // Render the calendar on the right
+    echo '<div style="float: right; width: 30%;">';
+    include(__DIR__ . '/calen.php');
+    echo '</div>';
 
-            $assignments = $DB->get_records('assign', array('course' => $enrol_course->courseid));
-
-            if ($assignments) {
-                foreach ($assignments as $assign_id) {
-                    $assign_name = $assign_id->name;
-
-                    $due_date = date('Y-m-d', $assign_id->duedate);
-
-                    // Check submission status
-                    $assign_status = $DB->get_record('assign_submission', array('assignment' => $assign_id->id, 'userid' => $USER->id));
-
-                    $course = $DB->get_record('course', array('id' => $enrol_course->courseid));
-
-
-                    $data = array(
-                        'course_name' => $course->fullname,
-                        'assignment_name' => $assign_name,
-                        'submission_status' => ($assign_status && $assign_status->status == "submitted") ? "You have submitted" : 'You have not submitted',
-                        'due_date' => $due_date,
-                    );
-
-                    // Check grades if submitted
-                    if ($assign_status && $assign_status->status === "submitted") {
-                        $assign_grades = $DB->get_record('assign_grades', array('assignment' => $assign_status->assignment, 'userid' => $USER->id));
-
-                        $role = $DB->get_record('role_assignments', array('id' => $assign_grades->grader));
-
-                        $teacher = $DB->get_record('user', array('id' => $role->userid));
-
-                        $name = $teacher->firstname . ' ' . $teacher->lastname;
-                        $assi_grade = $assign_grades->grade;
-
-                        $data['grade'] = ($assign_grades) ? $assign_grades->grade : 'Not graded';
-                        if ($assi_grade) {
-                            $data['teacher_name'] = $name;
-                        }
-                    } else {
-                        $data['grade'] = ''; // No grade if not submitted
-                    }
-                    $template_data[] = $data;
-                }
-            }
-        }
-    } else {
-        echo '<p>You are not enrolled in any course.</p>';
-    }
-
-    // Send assignment data to the template file
-    $templatecontext['assignments'] = $template_data;
-
-    echo $OUTPUT->render_from_template('local_control/course', $templatecontext);
-
-    echo "<br>";
-    echo "<br>";
-    // Fetch attendance data from the database based on the user ID
-    $attendanceDataFromDB = $DB->get_records('attendance_log', array('studentid' => $USER->id));
-
-    // Prepare an array to store attendance data for the Mustache template
-    $attendanceData = array();
-
-    foreach ($attendanceDataFromDB as $log) {
-        // Convert timestamp to a readable date format
-        $dateTaken = date('Y-m-d', $log->timetaken);
-
-        // Fetch the corresponding session information from mdl_attendance_sessions
-        $session = $DB->get_record('attendance_sessions', array('id' => $log->sessionid));
-
-        // Check if the session is found
-        if ($session) {
-            // Fetch the corresponding attendance information from mdl_attendance
-            $attendance = $DB->get_record('attendance', array('id' => $session->attendanceid));
-
-            // Check if the attendance information is found
-            if ($attendance) {
-                // Convert session date timestamp to a readable date format
-                $date = date('Y-m-d', $session->sessdate);
-
-                $course_id = $DB->get_record('course', array('id' => $attendance->course));
-
-                // Fetch the corresponding status description from mdl_attendance_statuses
-                $statusDescription = '';
-                $status = $DB->get_record('attendance_statuses', array('id' => $log->statusid));
-
-                // Check if the status information is found
-                if ($status) {
-                    $statusDescription = $status->description;
-                } else {
-                }
-
-                // Add the data to the array
-                $attendanceData[] = array(
-                    'date' => $date,
-                    'attendance' => $statusDescription,
-                    'remarks' => $log->remarks,
-                    'courses' => $course_id->shortname,
-                );
-            } else {
-            }
-        } else {
-        }
-    }
-
-    // Prepare data for Mustache template
-    $templatecontext['attendanceData'] = $attendanceData;
-
-    // Render the attendance table using Mustache
-    echo $OUTPUT->render_from_template('local_control/attendance', $templatecontext);
-} else {
-    $message = "You are not a student to be logged into the Parent Control Plugin";
-    \core\notification::error($message);
-    redirect(new moodle_url('/'));
+    echo $OUTPUT->footer();
 }
-echo "<br";
-echo "<br";
-include(__DIR__ . '/calen.php');
-echo $OUTPUT->footer();
 
 function is_user_authenticated()
 {

@@ -11,16 +11,7 @@
         <FIELD NAME="password" TYPE="text" NOTNULL="true" SEQUENCE="false" />
         <FIELD NAME="full_name" TYPE="text" NOTNULL="true" SEQUENCE="false" />
         <FIELD NAME="student_id" TYPE="text" NOTNULL="true" SEQUENCE="false" />
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="results_of_students" COMMENT="Each record is of records of students">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
-        <FIELD NAME="subjects" TYPE="text" NOTNULL="true" SEQUENCE="false" />
-        <FIELD NAME="marks_obtained" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="email" TYPE="text" NOTNULL="true" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" />
