@@ -12,6 +12,8 @@
         <FIELD NAME="full_name" TYPE="text" NOTNULL="true" SEQUENCE="false" />
         <FIELD NAME="student_id" TYPE="text" NOTNULL="true" SEQUENCE="false" />
         <FIELD NAME="email" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="code" TYPE="char" LENGTH="7" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="verify" TYPE="text" NOTNULL="true" SEQUENCE="false" DEFAULT="0" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" />

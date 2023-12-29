@@ -25,7 +25,7 @@ $user_name = $user->username;
     <button onclick="window.location.href='<?php echo $assignmenturl; ?>'">Assignment</button>
     <button onclick="window.location.href='<?php echo $attendanceurl; ?>'">Attendance</button>
     <button onclick="window.location.href='<?php echo $logouturl; ?>'">Logout</button>
-    <br>
+    <br><br>
     <h3 style="text-align: center;">Welcome <?php echo $user_name; ?></h3>
 </div>
 

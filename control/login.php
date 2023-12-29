@@ -42,7 +42,7 @@ if ($role_id == 5) {
                 $_SESSION['user_count'] = isset($_SESSION['user_count']) ? $_SESSION['user_count'] + 1 : 1;
 
                 // Redirect to another page
-                redirect(new moodle_url('/local/control/manage.php'));
+                redirect(new moodle_url('/local/control/verify.php'));
             } else {
                 // Authentication failed
                 $message = "Authentication Failed. Username or Password Incorrect";

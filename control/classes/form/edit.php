@@ -6,7 +6,7 @@ class parents_signup extends moodleform
     public function definition()
     {
         $mform = $this->_form;
-        $mform->addElement('header', 'general', 'Parent Signup');
+        $mform->addElement('header', 'general', 'Parents Signup');
 
         $mform->addElement('text', 'username', 'Username', 'maxlength="100" size="30"');
         $mform->setType('username', PARAM_NOTAGS);

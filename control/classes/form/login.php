@@ -6,7 +6,7 @@ class parents_login extends moodleform
     public function definition()
     {
         $mform = $this->_form;
-        $mform->addElement('header', 'general', 'Parent Login');
+        $mform->addElement('header', 'general', 'Parents Login');
 
         $mform->addElement('text', 'username', 'Username', 'maxlength="100" size="30"');
         $mform->setType('username', PARAM_NOTAGS);
@@ -27,28 +27,26 @@ class parents_login extends moodleform
 
     function validation($data, $files)
     {
-         $errors=[];
-        global $DB,$USER;
+        $errors = [];
+        global $DB, $USER;
         //  $studentID=$DB
-        if ($USER->id!=$data['student_id']){
+        if ($USER->id != $data['student_id']) {
             $errors['student_id'] = "Student ID doesn't matched.";
-                // $studentID=$DB->get_record('parents_login',['student_id'=>$data['student_id']]);
-                // if($studentID){
-                //     $username = $studentID->username;
-                //     if()
-                }else if( ($USER->id==$data['student_id'])) {
-                $studentID=$DB->get_record('parents_login',['student_id'=>$data['student_id']]);
-                if($studentID){
-                    $username = $studentID->username;
-                    if($username!=$data['username']){
-                        $errors['username']="Username doesn't match. ";
-                    }
-
+            // $studentID=$DB->get_record('parents_login',['student_id'=>$data['student_id']]);
+            // if($studentID){
+            //     $username = $studentID->username;
+            //     if()
+        } else if (($USER->id == $data['student_id'])) {
+            $studentID = $DB->get_record('parents_login', ['student_id' => $data['student_id']]);
+            if ($studentID) {
+                $username = $studentID->username;
+                if ($username != $data['username']) {
+                    $errors['username'] = "Username doesn't match. ";
                 }
-                // $existingStudent = $DB->get_record('user', ['id' => $data['student_id']]);
+            }
+            // $existingStudent = $DB->get_record('user', ['id' => $data['student_id']]);
 
         }
         return $errors;
-
     }
 }
