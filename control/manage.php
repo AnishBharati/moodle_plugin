@@ -10,7 +10,7 @@ $PAGE->set_title("Control");
 
 // Custom authentication check
 if (!is_user_authenticated()) {
-    // User is not authenticated, redirect to login page
+    // User is not authenticated, redirect to the login page
     redirect(new moodle_url('/local/control/login.php'));
 }
 
@@ -20,71 +20,70 @@ $role_id = $user_role->roleid;
 if ($role_id == 5) {
     echo $OUTPUT->header();
 
-    include(__DIR__ . '/navigation.php');
-
-    // user is recognized by the user id 
+    // Get user information
     $user = $DB->get_record('user', array('id' => $USER->id));
     $name = $user->firstname . ' ' . $user->lastname;
     $email = $user->email;
     $id = $USER->id;
 
+    // Get user's enrolled courses
     $user_courses = $DB->get_records('user_enrolments', array('userid' => $USER->id));
 
-    // value of name and email are sent to the Mustache file
+    // Set template context
     $templatecontext['name'] = $name;
     $templatecontext['email'] = $email;
     $templatecontext['id'] = $id;
 
-    // Render the main content on the left
-    echo '<div style="float: left; width: 70%; border-right: 2px solid #ddd; padding-right: 10px;">';
+    // Main content layout
+    echo '<div class="container-fluid">';
+    echo '<div class="row">';
+
+    // Navigation bar column with increased height
+    echo '<div class="col-md-2" style="height: 100vh; border-right: 1px solid #ddd; padding-top: 30px; font-family: sans-serif;">';
+    include(__DIR__ . '/navigation.php'); // Include the navigation bar
+    echo '</div>';
+
+    // Main content columns
+    echo '<div class="col-md-5" style="background-color: #ffffff; padding: 20px; font-family: sans-serif; margin-bottom: 20px;">'; // Added margin-bottom
     echo $OUTPUT->render_from_template('local_control/manage', $templatecontext);
 
     // Display the list of enrolled courses
-    echo '<style>';
-    echo '.course-cards { display: flex; flex-wrap: wrap; justify-content: space-around; }';
-    echo '.course-card { width: 300px; padding: 20px; margin: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }';
-    echo '.course-card h3 { font-size: 1.5em; margin-bottom: 10px; }';
-    echo '.course-card p { color: #555; }';
-    echo '.course-card a { display: block; margin-top: 15px; color: #007bff; text-decoration: none; }';
-    echo '</style>';
+    echo '<div class="course-cards-container" style="margin-top: 20px; max-height: 450px; overflow-y: auto; padding-right: 10px; font-family: sans-serif;">'; // Adjusted font style
+    echo '<h3 style="color: #333; font-size: 1.75rem; font-family: sans-serif !important;">List of Enrolled Courses</h3>';
+    echo '<div class="course-cards" style="display: flex; flex-wrap: wrap;">';
+    foreach ($user_courses as $enrolment) {
+        $enrol_course = $DB->get_record('enrol', array('id' => $enrolment->enrolid));
 
-    echo '<br>';
-    echo '<h3 style="text-align: center;">List of Enrolled Courses</h3>';
+        if ($enrol_course) {
+            $course = $DB->get_record('course', array('id' => $enrol_course->courseid));
 
-    if (!empty($user_courses)) {
-        echo '<div class="course-cards">';
-        foreach ($user_courses as $enrolment) {
-            // Fetch course information using enrol ID
-            $enrol_course = $DB->get_record('enrol', array('id' => $enrolment->enrolid));
-
-            if ($enrol_course) {
-                // Fetch course information using course ID
-                $course = $DB->get_record('course', array('id' => $enrol_course->courseid));
-
-                if ($course) {
-                    // Display course card
-                    echo '<div class="course-card">';
-                    echo '<h3>' . $course->fullname . '</h3>';
-                    echo '<p>' . $course->shortname . '</p>';
-                    echo '</div>';
-                } else {
-                    echo '<p>Course information not found.</p>';
-                }
+            if ($course) {
+                echo '<a href="' . new moodle_url('/course/view.php', array('id' => $course->id)) . '" style="text-decoration: none; width: 48%; margin: 1%; box-sizing: border-box;">';
+                echo '<div class="course-card" style="background-color: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 10px; cursor: pointer; height: 120px; display: flex; flex-direction: column; justify-content: space-between;">';
+                echo '<h4 style="color: #333; font-size: 20px; margin-bottom: 5px;">' . $course->fullname . '</h4>';
+                echo '<p style="color: #555; font-size: 18px; margin-top: 5px;">' . $course->shortname . '</p>';
+                echo '</div>';
+                echo '</a>';
             } else {
-                echo '<p>Enrolment information not found.</p>';
+                echo '<p class="error-message" style="color: #ff0000; font-size: 14px;">Course information not found.</p>';
             }
+        } else {
+            echo '<p class="error-message" style="color: #ff0000; font-size: 14px;">Enrolment information not found.</p>';
         }
-        echo '</div>';
-    } else {
-        echo '<p>You are not enrolled in any courses.</p>';
     }
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';  // Close the enrolled courses div
 
-    echo '</div>';  // Close the main content div
-
-    // Render the calendar on the right
-    echo '<div style="float: right; width: 30%;">';
+    // Event table column at the bottom with reduced size
+    echo '<div class="col-md-5" style="background-color: #ffffff; padding: 20px; font-family: sans-serif;">'; // Adjusted font style
+    echo '<div class="calen-container" style="max-height: 450px; overflow-y: auto; height: 500px; font-family: sans-serif;">'; // Adjusted font style and fixed height
     include(__DIR__ . '/calen.php');
     echo '</div>';
+    echo '</div>';
+
+    echo '</div>'; // Close the row
+    echo '</div>'; // Close the container
 
     echo $OUTPUT->footer();
 }
@@ -94,3 +93,4 @@ function is_user_authenticated()
     // Return true if authenticated, false otherwise
     return isset($_SESSION['user_count']) && $_SESSION['user_count'] === 1;
 }
+?>

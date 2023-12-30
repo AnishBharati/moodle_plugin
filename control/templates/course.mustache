@@ -8,34 +8,73 @@
     body {
       font-family: 'Arial', sans-serif;
       background-color: #f5f5f5;
-      margin: 10px;
-      margin-bottom : 20px;
+      margin: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #f5f5f5; /* Matching background color with the navigation bar */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
     }
 
     h3 {
       text-align: center;
       color: #333;
+      margin-bottom: 20px;
+      padding: 20px 0;
+      background-color: #f5f5f5; /* Matching background color with the navigation bar */
+      border-radius: 8px 8px 0 0;
+      font-size: 24px;
+      font-weight: bold;
     }
 
-    
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: -1px;
+      background-color: #f5f5f5; /* Matching background color with the navigation bar */
     }
 
     th, td {
-      padding: 12px;
+      padding: 15px;
       text-align: left;
       border-bottom: 1px solid #ddd;
+      color: #555;
     }
 
     th {
-      background-color: #f8f8f8;
+      background-color: #f5f5f5; /* Matching background color with the navigation bar */
+      color: #333;
     }
 
     tr:nth-child(even) {
-      background-color: #f2f2f2;
+      background-color: #f9f9f9;
+    }
+
+    .dropdown-container,
+    .filter-input {
+      margin-bottom: 10px;
+    }
+
+    .table-container {
+      overflow-y: auto;
+      max-height: 200px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .filter-input input,
+    .dropdown-container select {
+      width: calc(100% - 16px);
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 5px;
     }
   </style>
 </head>
@@ -44,27 +83,57 @@
   <div class="container">
     <h3>Assignment Details</h3>
 
-    <table>
-      <tr>
-        <th>Course Name</th>
-        <th>Assignment</th>
-        <th>Status</th>
-        <th>Due Date</th>
-        <th>Grade</th>
-        <th>Checked By</th>
-      </tr>
-      {{#assignments}}
-      <tr>
-        <td>{{course_name}}</td>
-        <td>{{assignment_name}}</td>
-        <td>{{submission_status}}</td>
-        <td>{{due_date}}</td>
-        <td>{{grade}}</td>
-        <td>{{teacher_name}}</td>
-      </tr>
-      {{/assignments}}
-    </table>
+    <div class="filter-input" id="filterContainer">
+      <label for="filterInput">Filter by Course:</label>
+      <input type="text" id="filterInput" oninput="filterTable()" placeholder="Type to filter courses">
+    </div>
+
+    <div class="table-container" id="assignmentTableContainer">
+      <table>
+        <thead>
+          <tr>
+            <th>Course</th>
+            <th>Assignment</th>
+            <th>Status</th>
+            <th>Due Date</th>
+            <th>Grade</th>
+            <th>Teacher</th>
+          </tr>
+        </thead>
+        <tbody id="assignmentTableBody">
+          {{#assignments}}
+          <tr data-course="{{course_name}}">
+            <td>{{course_name}}</td>
+            <td>{{assignment_name}}</td>
+            <td>{{submission_status}}</td>
+            <td>{{due_date}}</td>
+            <td>{{grade}}</td>
+            <td>{{teacher_name}}</td>
+          </tr>
+          {{/assignments}}
+        </tbody>
+      </table>
+    </div>
   </div>
+
+  <script>
+    function filterTable() {
+      var filterValue = document.getElementById("filterInput").value.toUpperCase();
+      var table = document.getElementById("assignmentTableBody");
+      var rows = table.getElementsByTagName("tr");
+
+      for (var i = 0; i < rows.length; i++) {
+        var courseValue = rows[i].getAttribute("data-course").toUpperCase();
+        var textContent = rows[i].textContent || rows[i].innerText;
+
+        if (filterValue === "" || courseValue.includes(filterValue)) {
+          rows[i].style.display = "";
+        } else {
+          rows[i].style.display = "none";
+        }
+      }
+    }
+  </script>
 </body>
 
 </html>

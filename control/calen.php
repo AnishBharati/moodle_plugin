@@ -71,14 +71,13 @@ if ($events === false) {
 
             caption {
                 text-align: left;
-                font-weight: bold;
                 margin-bottom: 10px;
             }
 
             .message {
                 color: #333;
                 margin-top: 20px;
-                font-weight: bold;
+                
             }
         </style>
     </head>
@@ -135,7 +134,7 @@ if ($events === false) {
             // Display events or a message if no events were found
             echo '<div class="message">';
             if (empty($filteredEvents)) {
-                echo "No events found for the selected year and/or month.";
+                echo "No events found for the selected year/month.";
             } else {
                 // Display events in a table
                 echo "<table>";

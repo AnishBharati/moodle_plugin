@@ -3,7 +3,6 @@ require_once(__DIR__ . '/../../config.php');
 
 echo $OUTPUT->header();
 
-
 $PAGE->set_url(new moodle_url('/local/control/attendance.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title("Attendance Details");
@@ -82,3 +81,4 @@ function is_user_authenticated()
     // Return true if authenticated, false otherwise
     return isset($_SESSION['user_count']) && $_SESSION['user_count'] === 1;
 }
+?>
