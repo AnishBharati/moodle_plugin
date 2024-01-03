@@ -70,11 +70,23 @@ if ($role_id == 5) {
         } else {
             echo '<p class="error-message" style="color: #ff0000; font-size: 14px;">Enrolment information not found.</p>';
         }
+
     }
+    echo '<br>';
+    echo '<br>';
+    echo '<br>';
+    echo '<br>';
+    $student_id=$DB->get_record('student_fee',array('student_id'=>$USER->id));
+    $s_name=$student_id->student_name;
+    $s_fee=$student_id->total_fee;
+    $s_due=$student_id->due_date;
+
+    echo '<h3>Fee details</h3>';
+    echo 'Your children name '.$s_name.' has the total fee '.$s_fee.' on due date '.$s_due;
     echo '</div>';
     echo '</div>';
     echo '</div>';  // Close the enrolled courses div
-
+   
     // Event table column at the bottom with reduced size
     echo '<div class="col-md-5" style="background-color: #ffffff; padding: 20px; font-family: sans-serif;">'; // Adjusted font style
     echo '<div class="calen-container" style="max-height: 450px; overflow-y: auto; height: 500px; font-family: sans-serif;">'; // Adjusted font style and fixed height
